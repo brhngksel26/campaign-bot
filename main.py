@@ -1,5 +1,8 @@
 from driveServices import Create_Service
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload,MediaIoBaseDownload
+import io
+import os
+
 
 CLIENT_SECRET_FILE = 'client_secrets.json'
 API_NAME = 'drive'
@@ -45,6 +48,18 @@ def listFolders(folderName):
             return file['id']
 
 
+def getFileId(fileName):
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    file_service = service.files()
+    results = file_service.list(pageSize=10, fields="files(id, name)").execute()
+    file_list = results.get('files')
+    for file in file_list:
+        if file['name'] == fileName:
+            return file['id']
+
+
+
+
 def uploadFile(folderName):
     service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
     folder_id = listFolders(folderName)
@@ -65,8 +80,39 @@ def uploadFile(folderName):
             fields = 'id'
         ).execute()
 
+def downloadFile(fileName):
+
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    
+    file_name = "campaign.xlsx"
+    file_id = getFileId(file_name)
+
+    request = service.files().get_media(fileId=file_id)
+    fh = io.BytesIO()
+
+    downloader = MediaIoBaseDownload(fd=fh,request=request)
+    done = False
+
+    while not done:
+        status,done = downloader.next_chunk()
+        progress = status.progress() * 100
+        print(f'Download progress {progress}')
+
+    fh.seek(0)
+
+    with open(os.path.join('./download',file_name),"wb") as f:
+        f.write(fh.read())
+        f.close()
+
+
+
+
 
 #print((listFolders("alictus")))
 
 #createFolder()
-uploadFile("alictus")
+#uploadFile("alictus")
+
+#print(getFileId("campaign.xlsx"))
+
+downloadFile("campaign.xlsx")
