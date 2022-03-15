@@ -113,6 +113,8 @@ def downloadFile(fileName):
 #createFolder()
 #uploadFile("alictus")
 
-#print(getFileId("campaign.xlsx"))
+print(getFileId("campaign-bot"))
 
-downloadFile("campaign.xlsx")
+#downloadFile("campaign.xlsx")
+
+
