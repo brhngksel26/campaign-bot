@@ -32,7 +32,7 @@ def getSheetId(fileName):
             return file['id']
 
 
-def getSheetValue(fileName):
+def getSheetValue():
     service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
     #sheetId = getSheetId(fileName)
     id = "1cwBp8Y4xzL5lJyg8gY11KIn_RJ9444d1t6EBcAwhkvM"
@@ -44,88 +44,83 @@ def getSheetValue(fileName):
     return data["values"]
 
 
+def clearData():
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    #sheetId = getSheetId(fileName)
+    id = "1cwBp8Y4xzL5lJyg8gY11KIn_RJ9444d1t6EBcAwhkvM"
+
+    body = {
+        "requests" : [
+            {
+                'updateCells' : {
+                    'range': {
+                        'sheetId' : id
+                    },
+                    'fields' : "*"
+                }
+            }
+        ]
+    }
+
+    service.spreadsheets().batchUpdate(
+        spreadsheetId=id,
+        body=body
+    ).execute()
+
+def insertData():
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    #sheetId = getSheetId(fileName)
+    id = "1MX0fopRIW5jweO6bnymnHigvjGiykXncE_gp7uG3gRA"
+
+    valueData = getSheetValue()
+
+
+    body = {
+        'majorDimension' : "ROWS",
+        "values" : valueData
+    }
+
+    service.spreadsheets().values().update(
+        spreadsheetId=id,
+        body=body,
+        range= "A1",
+        valueInputOption = 'USER_ENTERED'
+    ).execute()
+
+
+    pass
+
 def updateColumns():
     service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
     id = "1MX0fopRIW5jweO6bnymnHigvjGiykXncE_gp7uG3gRA"
 
-    request_body = {
-    'requests': [
-        {
-            'updateCells': {
-                'rows': {
-                    'values': [
-                        {
-                            'pivotTable': {
-                                # Data Source
-                                'source': {
-                                    'sheetId': '0',
-                                    'startRowIndex': 1,
-                                    'startColumnIndex': 0,
-                                    'endRowIndex': 14,
-                                    'endColumnIndex': 7 # base index is 1
-                                },
-                                
-                                # Rows Field(s)
-                                'rows': [
-                                    # row field #1
-                                    {
-                                        'sourceColumnOffset': 1,
-                                        'showTotals': True, # display subtotals
-                                        'sortOrder': 'ASCENDING',
-                                        'repeatHeadings': True,
-                                        'label': 'Country List',
-                                    }
-                                ],
+    resource = {
+        "majorDimension": "ROWS",
+        "values": "=PRODUCT(C2;E2)"
+    }
 
-                                # Columns Field(s)
-                                'columns': [
-                                    # column field #1
-                                    {
-                                        'sourceColumnOffset': 14,
-                                        'sortOrder': 'ASCENDING', 
-                                        'showTotals': True
-                                    }
-                                ],
+    formulaList = []
+    test = []
+    for i in range(2,15):
+        formulaList.append(f"=PRODUCT(C{i};E{i})")
 
-                                # Values Field(s)
-                                'values': [
-                                    # value field #1
-                                    {
-                                        'summarizeFunction': 'CUSTOM',
-                                        'sourceColumnOffset': 7,
-                                        'name': '=C*E '
-                                    }
-                                ],
-
-                                'valueLayout': 'HORIZONTAL'
-                            }
-                        }
-                    ]
-                },
-                
-                'start': {
-                    'sheetId': '0',
-                    'rowIndex': 1, # 4th row
-                    'columnIndex': 6 # 3rd column
-                },
-                'fields': 'pivotTable'
-            }
-        }
-    ]
-}
+    body={"majorDimension": "ROWS", "values": formulaList}
+    
+    sheetRange = "G2:G14"
    
-    response = service.spreadsheets().batchUpdate(
+    service.spreadsheets().values().append(
         spreadsheetId=id,
-        body=request_body
+        body=body,
+        range=sheetRange
     ).execute()
 
 #createSheet()
-#print(getSheetId("campaign.xlsx"))
-updateColumns()
+#print(getSheetValue("campaign.xlsx"))
+#updateColumns()
 
-"""tests = getSheetValue("campaign.xlsx")
+"""tests = getSheetValue()
 for test in tests:
     print(test)"""
 
-
+insertData()
 
