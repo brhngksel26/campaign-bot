@@ -39,17 +39,93 @@ def getSheetValue(fileName):
 
     data  = service.spreadsheets().values().get(
             spreadsheetId=id,
-            majorDimension="ROWS",
-            range="A1:F6").execute()
+            range="A:F").execute()
 
     return data["values"]
 
 
+def updateColumns():
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    id = "1MX0fopRIW5jweO6bnymnHigvjGiykXncE_gp7uG3gRA"
+
+    request_body = {
+    'requests': [
+        {
+            'updateCells': {
+                'rows': {
+                    'values': [
+                        {
+                            'pivotTable': {
+                                # Data Source
+                                'source': {
+                                    'sheetId': '0',
+                                    'startRowIndex': 1,
+                                    'startColumnIndex': 0,
+                                    'endRowIndex': 14,
+                                    'endColumnIndex': 7 # base index is 1
+                                },
+                                
+                                # Rows Field(s)
+                                'rows': [
+                                    # row field #1
+                                    {
+                                        'sourceColumnOffset': 1,
+                                        'showTotals': True, # display subtotals
+                                        'sortOrder': 'ASCENDING',
+                                        'repeatHeadings': True,
+                                        'label': 'Country List',
+                                    }
+                                ],
+
+                                # Columns Field(s)
+                                'columns': [
+                                    # column field #1
+                                    {
+                                        'sourceColumnOffset': 14,
+                                        'sortOrder': 'ASCENDING', 
+                                        'showTotals': True
+                                    }
+                                ],
+
+                                # Values Field(s)
+                                'values': [
+                                    # value field #1
+                                    {
+                                        'summarizeFunction': 'CUSTOM',
+                                        'sourceColumnOffset': 7,
+                                        'name': '=C*E '
+                                    }
+                                ],
+
+                                'valueLayout': 'HORIZONTAL'
+                            }
+                        }
+                    ]
+                },
+                
+                'start': {
+                    'sheetId': '0',
+                    'rowIndex': 1, # 4th row
+                    'columnIndex': 6 # 3rd column
+                },
+                'fields': 'pivotTable'
+            }
+        }
+    ]
+}
+   
+    response = service.spreadsheets().batchUpdate(
+        spreadsheetId=id,
+        body=request_body
+    ).execute()
+
 #createSheet()
 #print(getSheetId("campaign.xlsx"))
-tests = getSheetValue("campaign.xlsx")
+updateColumns()
+
+"""tests = getSheetValue("campaign.xlsx")
 for test in tests:
-    print(test)
+    print(test)"""
 
 
 
