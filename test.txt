@@ -22,3 +22,7 @@
     barPloty = px.bar(df,x = "header", y = "value", title = title)
 
     barPloty.show()
+
+
+
+    soket xapp-1-A037B44QDAQ-3263944144817-2ec77f99cc74468d083d742907c8d5cc5f0ae43d0cf4f3139c8d33c369ab542f
