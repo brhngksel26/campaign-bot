@@ -1,7 +1,7 @@
 from slack_sdk import WebClient
 from flask import Flask
 from slackeventsapi import SlackEventAdapter
-
+from app.mainSheets import getCampaignValue
 
 token = "xoxb-3232191403175-3270567506144-Oh7ALqR6c58Rj5Ca1wLrov7W"
 signing_secret = "2f47b4f69fc6cc41ab0a8d99794176c7"
@@ -30,6 +30,27 @@ def getMessage(payload):
 def index():
     client.chat_postMessage(channel="#campaign",text="text")
     return "asdasd"
+
+@app.route("/campaign/<campaign>")
+def campaign(campaign):
+    campaignData = []
+
+    if campaign.find("+") == -1:
+        campaignData.append(campaign)
+    else:
+        campaignData = campaign.split("+")
+
+    sheetData = getCampaignValue(campaignData)
+    header = ['Campaign name', 'Total Impression', 'Total Clicks', 'CTR (%)', 'CPC', 'Total App Install']
+    for data in sheetData:
+        message =autoReplace(header) + "\n" + autoReplace(data)
+        client.chat_postMessage(channel="#campaign",text=message)
+        
+    return "campaignData"
+
+    
+def autoReplace(message):
+    return str(message).replace("[","").replace("'","-").replace("]","")
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -43,6 +43,24 @@ def getSheetValue():
 
     return data["values"]
 
+def getCampaignValue(campaigns):
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+    #sheetId = getSheetId(fileName)
+    id = "1cwBp8Y4xzL5lJyg8gY11KIn_RJ9444d1t6EBcAwhkvM"
+
+    data  = service.spreadsheets().values().get(
+            spreadsheetId=id,
+            range="A:F").execute()
+
+    returnDataList = []
+
+    for value in data["values"]:
+        for campaign in campaigns:
+            if str(value[0]) == str(campaign).upper():
+                returnDataList.append(value)
+
+    return returnDataList
+
 
 def clearData():
     service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)

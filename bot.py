@@ -1,22 +1,37 @@
-import os
-from slack import RTMClient
+from slack_sdk import WebClient
 
-@RTMClient.run_on(event="message")
-def say_hello(**payload):
-  data = payload['data']
-  web_client = payload['web_client']
 
-  if 'Hello' in data['text']:
-    channel_id = data['channel']
-    thread_ts = data['ts']
-    user = data['user'] # This is not username but user ID (the format is either U*** or W***)
+token = "xoxb-3232191403175-3270567506144-Oh7ALqR6c58Rj5Ca1wLrov7W"
 
-    web_client.chat_postMessage(
-      channel=channel_id,
-      text=f"Hi <@{user}>!",
-      thread_ts=thread_ts
+client = WebClient(token=token)
+
+
+
+
+def main():
+    channel_name = "campaign"
+    conversation_id = None
+    for result in client.conversations_list():
+        if conversation_id is not None:
+            break
+        for channel in result["channels"]:
+            if channel["name"] == channel_name:
+                conversation_id = channel["id"]
+                #Print result
+                print(f"Found conversation ID: {conversation_id}")
+                break
+   
+def read():
+    result = client.conversations_history(
+        channel="C037B3Z5Y20",
+        inclusive=True,
+        oldest="1610144875.000600",
+        limit=1
     )
 
-slack_token = "xoxb-3232191403175-3270567506144-Oh7ALqR6c58Rj5Ca1wLrov7W"
-rtm_client = RTMClient(token=slack_token)
-rtm_client.start()
+    message = result["messages"][0]
+    # Print message text
+    print(message["text"])
+
+if __name__ == '__main__':
+    read()
