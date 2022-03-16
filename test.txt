@@ -11,3 +11,14 @@
     ('M', '16611', '108', '0,65', ' 0.4604180', '57']
     ('N', '10246', '57', '0,56', ' 0.5342519', '27']
     ('O', '145467', '675', '0,46', ' 0.3499587', '340']
+
+
+
+      df = pd.DataFrame({
+        "header" :  header_graph,
+        "value"  :  data
+    })
+
+    barPloty = px.bar(df,x = "header", y = "value", title = title)
+
+    barPloty.show()
